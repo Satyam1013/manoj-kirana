@@ -73,19 +73,40 @@ like the frontend's `customerBalance()`.
 | GET | `/api/cold-storage/stores/:storeId/rent-payments?search=` | `{ rents, totalRent }` |
 | POST | `/api/cold-storage/rent-payments` | `{ storeId, date?, amount }` |
 
-## 5. Project structure
+## 5. Rice Mill endpoints
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/rice-mill/mills?search=` | list mills with `intakeCount`/`outputCount` |
+| GET | `/api/rice-mill/mills/:id` | one mill |
+| POST | `/api/rice-mill/mills` | `{ name }` |
+| DELETE | `/api/rice-mill/mills/:id` | also removes its intake/output entries |
+| GET | `/api/rice-mill/mills/:millId/intake?partyType=private\|government&search=` | intake entries (paddy coming in) |
+| POST | `/api/rice-mill/intake` | `{ millId, partyType, partyName, date?, time?, lotNumber?, paddyVariety?, bagsCount?, weightKg?, ratePerKg?, vehicleNumber?, moistureContent? }` |
+| GET | `/api/rice-mill/mills/:millId/output?partyType=private\|government&search=` | output entries (rice dispatched out) |
+| POST | `/api/rice-mill/output` | `{ millId, partyType, partyName, date?, riceType?, bagsCount?, weightKg?, ratePerKg?, vehicleNumber?, linkedIntakeLot? }` |
+| DELETE | `/api/rice-mill/entries/:id?type=intake\|output` | remove an intake or output entry |
+| GET | `/api/rice-mill/mills/:millId/summary` | totals grouped by `partyType`: `{ intake: { private: { bags, weightKg }, government: {...} }, output: {...}, yieldPercent }` where `yieldPercent = totalOutputWeight / totalIntakeWeight * 100` |
+
+`partyType` is always `'private'` or `'government'`. `linkedIntakeLot` on an
+output entry is a free-text reference to an intake `lotNumber` for
+traceability — it isn't a hard foreign key, so it's never validated
+against existing intake entries.
+
+## 6. Project structure
 
 ```
 src/
   auth/            user schema, JWT strategy/guard, register+login
   kirana/          customers, ledger entries, inventory, bills, receipts
   cold-storage/    stores, in/out entries, rent payments
+  rice-mill/       mills, intake/output entries, party-wise summary
   common/          shared decorators (CurrentUser)
   app.module.ts
   main.ts
 ```
 
-## 6. Notes on matching the frontend exactly
+## 7. Notes on matching the frontend exactly
 
 - IDs are MongoDB ObjectIds (24-char hex strings) instead of the
   frontend's client-generated `uid()` strings — everything else

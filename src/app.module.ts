@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { KiranaModule } from './kirana/kirana.module';
 import { ColdStorageModule } from './cold-storage/cold-storage.module';
+import { RiceMillModule } from './rice-mill/rice-mill.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ColdStorageModule } from './cold-storage/cold-storage.module';
     AuthModule,
     KiranaModule,
     ColdStorageModule,
+    RiceMillModule,
   ],
 })
 export class AppModule {}
